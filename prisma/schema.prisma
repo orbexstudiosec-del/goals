@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Article {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  excerpt         String
+  content         String
+  coverImage      String?
+  coverImageAlt   String?
+  metaTitle       String?
+  metaDescription String?
+  published       Boolean   @default(false)
+  publishedAt     DateTime?
+  viewCount       Int       @default(0)
+  featured        Boolean   @default(false)
+  readingMinutes  Int       @default(3)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  tags ArticleTag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, publishedAt])
+  @@index([categoryId])
+  @@index([featured])
+}
+
+model Category {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String  @unique
+  description String?
+  color       String  @default("#f97316")
+  order       Int     @default(0)
+
+  articles Article[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tag {
+  id   String @id @default(cuid())
+  slug String @unique
+  name String @unique
+
+  articles ArticleTag[]
+
+  createdAt DateTime @default(now())
+}
+
+model ArticleTag {
+  articleId String
+  tagId     String
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+  @@index([tagId])
+}

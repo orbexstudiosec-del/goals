@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.article-body {
+  @apply text-[17px] leading-[1.75] text-neutral-800;
+}
+.article-body p {
+  @apply mb-5;
+}
+.article-body h2 {
+  @apply mt-10 mb-4 text-2xl font-bold text-neutral-900;
+}
+.article-body h3 {
+  @apply mt-8 mb-3 text-xl font-semibold text-neutral-900;
+}
+.article-body ul {
+  @apply mb-5 ml-5 list-disc space-y-2;
+}
+.article-body ol {
+  @apply mb-5 ml-5 list-decimal space-y-2;
+}
+.article-body a {
+  @apply text-brand-600 underline underline-offset-2 hover:text-brand-700;
+}
+.article-body blockquote {
+  @apply my-6 border-l-4 border-brand-500 bg-brand-50 px-5 py-3 italic text-neutral-700;
+}
+.article-body img {
+  @apply my-6 rounded-lg;
+}
