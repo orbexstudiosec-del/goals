@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import { headers } from "next/headers";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Analytics } from "@/components/Analytics";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -58,11 +60,14 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const pathname = (await headers()).get("x-pathname") || "";
+  const isAdmin = pathname.startsWith("/admin");
+
   return (
     <html lang="es-EC">
-      <body className="flex min-h-screen flex-col bg-white text-neutral-900">
-        {siteConfig.adsenseClient && (
+      <body className="flex min-h-screen flex-col bg-[#fbf6f1] text-neutral-900">
+        {siteConfig.adsenseClient && !isAdmin && (
           <Script
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${siteConfig.adsenseClient}`}
@@ -70,9 +75,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             strategy="afterInteractive"
           />
         )}
-        <Header />
+        {!isAdmin && <Header />}
         <main className="flex-1">{children}</main>
-        <Footer />
+        {!isAdmin && <Footer />}
+        {!isAdmin && <Analytics />}
       </body>
     </html>
   );

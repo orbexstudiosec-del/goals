@@ -1,7 +1,15 @@
 import { absoluteUrl } from "@/lib/site";
 
-export function ShareBar({ slug, title }: { slug: string; title: string }) {
-  const url = absoluteUrl(`/articulo/${slug}`);
+export function ShareBar({
+  slug,
+  title,
+  path,
+}: {
+  slug: string;
+  title: string;
+  path?: string;
+}) {
+  const url = absoluteUrl(path ?? `/articulo/${slug}`);
   const encoded = encodeURIComponent(url);
   const text = encodeURIComponent(title);
 

@@ -296,8 +296,104 @@ const articles: ArticleSeed[] = [
   },
 ];
 
+type MemeSeed = { caption: string; seed: string; author: string };
+type TextSeed = { type: "CONFESSION" | "NOTE"; title?: string; body: string; author: string };
+
+const memes: MemeSeed[] = [
+  { caption: "Cuando dije que estudiaría todo el fin de semana", seed: "meme-study", author: "ElCrack" },
+  { caption: "Yo esperando que baje el precio del pasaje", seed: "meme-bus", author: "Quiteño123" },
+  { caption: "Mi cuenta bancaria después de fin de mes", seed: "meme-bank", author: "Anónimo" },
+  { caption: "POV: tu mamá te manda al chino a las 11pm", seed: "meme-store", author: "Guayaco" },
+  { caption: "Cuando el profe dice 'esto va en el examen'", seed: "meme-exam", author: "Estudiante" },
+  { caption: "El lunes mirándome a los ojos", seed: "meme-monday", author: "OficinistaEC" },
+  { caption: "Yo fingiendo que entendí la reunión", seed: "meme-meeting", author: "TeleTrabajo" },
+  { caption: "Cuando encuentras $5 en el pantalón viejo", seed: "meme-money", author: "Afortunado" },
+];
+
+const texts: TextSeed[] = [
+  {
+    type: "CONFESSION",
+    title: "Nunca le dije que fui yo",
+    body: "En el cole rompí el vidrio de la dirección con un pelotazo y dejé que culparan a otro curso. Hasta hoy nadie sabe que fui yo. Me arrepiento, pero ya pasaron 8 años.",
+    author: "Anónimo",
+  },
+  {
+    type: "CONFESSION",
+    title: "Mi jefe cree que soy productivo",
+    body: "Llevo dos años trabajando desde casa y la verdad es que termino todo en 3 horas. El resto del día veo series con el laptop abierto por si suena Teams. Nadie se ha dado cuenta.",
+    author: "Anónimo",
+  },
+  {
+    type: "CONFESSION",
+    body: "Le dije a mi novia que me encanta la comida que cocina. La verdad es que como antes de llegar a su casa para poder fingir.",
+    author: "ElNovio",
+  },
+  {
+    type: "CONFESSION",
+    title: "Gasté los ahorros familiares en cripto",
+    body: "Invertí los ahorros que mi familia juntaba para un viaje. Subió, bajó, y al final recuperé justo lo mismo. Nadie supo nunca lo cerca que estuvimos del desastre.",
+    author: "Anónimo",
+  },
+  {
+    type: "CONFESSION",
+    body: "Sigo guardando los mensajes de mi ex de hace 4 años. No para volver, solo para acordarme de que sí fui feliz alguna vez.",
+    author: "Anónimo",
+  },
+  {
+    type: "NOTE",
+    title: "Los pulpos tienen tres corazones",
+    body: "Dos bombean sangre a las branquias y uno al resto del cuerpo. Además, su sangre es azul porque usa cobre en vez de hierro para transportar oxígeno.",
+    author: "DatoCurioso",
+  },
+  {
+    type: "NOTE",
+    title: "La miel nunca se daña",
+    body: "Se han encontrado tarros de miel de más de 3.000 años en tumbas egipcias y seguían siendo comestibles. Su bajísima humedad y acidez impiden que las bacterias sobrevivan.",
+    author: "AbejaReina",
+  },
+  {
+    type: "NOTE",
+    title: "Ecuador tiene la capital más cercana al sol… casi",
+    body: "Por la altura de Quito (2.850 m) y por estar en la mitad del mundo, el punto del Chimborazo es el lugar de la Tierra más lejano del centro del planeta y el más cercano al espacio.",
+    author: "OrgulloEC",
+  },
+  {
+    type: "NOTE",
+    title: "Un rayo es más caliente que el sol",
+    body: "La temperatura de un rayo puede alcanzar los 30.000 °C, cinco veces la temperatura de la superficie del sol (unos 5.500 °C).",
+    author: "TormentaData",
+  },
+  {
+    type: "NOTE",
+    title: "Las bananas son ligeramente radiactivas",
+    body: "Contienen potasio-40, un isótopo radiactivo natural. Tan común es que existe la 'dosis equivalente de banana' para explicar la radiación de forma sencilla.",
+    author: "CienciaPop",
+  },
+];
+
+const sampleComments = [
+  "JAJAJA me pasó igual 😂",
+  "Esto es demasiado real",
+  "No puede ser, me sentí atacado",
+  "El mejor post del día sin duda",
+  "Gracias por compartir, no lo sabía 👏",
+  "Me hiciste el día con esto",
+  "Uff, qué fuerte 😮",
+  "Real, demasiado real",
+];
+
+const voterTokens = Array.from({ length: 25 }, (_, i) => `seed-voter-${i + 1}`);
+const reactionEmojis = ["😂", "❤️", "😮", "🔥", "😢"];
+const commenters = ["Pedro", "Maria", "Anónimo", "Juancho", "Sofi", "ElPana", "Vale"];
+
 async function main() {
   console.log("Cleaning previous data...");
+  await prisma.commentVote.deleteMany();
+  await prisma.comment.deleteMany();
+  await prisma.reaction.deleteMany();
+  await prisma.vote.deleteMany();
+  await prisma.postTag.deleteMany();
+  await prisma.post.deleteMany();
   await prisma.articleTag.deleteMany();
   await prisma.article.deleteMany();
   await prisma.tag.deleteMany();
@@ -348,8 +444,78 @@ async function main() {
     }
   }
 
+  console.log("Creating community posts (memes, confessions, notes)...");
+
+  // helper para sembrar votos, reacciones y comentarios en un post
+  async function seedEngagement(postId: string, intensity: number) {
+    const upvoters = voterTokens.slice(0, intensity);
+    let score = 0;
+    for (const t of upvoters) {
+      const value = Math.random() < 0.85 ? 1 : -1;
+      score += value;
+      await prisma.vote.create({ data: { postId, voterToken: t, value } });
+    }
+    const reactors = voterTokens.slice(0, Math.ceil(intensity / 2));
+    for (const t of reactors) {
+      const emoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
+      await prisma.reaction.upsert({
+        where: { postId_voterToken_emoji: { postId, voterToken: t, emoji } },
+        update: {},
+        create: { postId, voterToken: t, emoji },
+      });
+    }
+    const nComments = Math.floor(Math.random() * 4);
+    let commentCount = 0;
+    for (let i = 0; i < nComments; i++) {
+      commentCount++;
+      await prisma.comment.create({
+        data: {
+          postId,
+          authorName: commenters[Math.floor(Math.random() * commenters.length)],
+          authorToken: `seed-commenter-${i}`,
+          body: sampleComments[Math.floor(Math.random() * sampleComments.length)],
+        },
+      });
+    }
+    await prisma.post.update({ where: { id: postId }, data: { score, commentCount } });
+  }
+
+  let order = 0;
+  for (const m of memes) {
+    const post = await prisma.post.create({
+      data: {
+        type: "MEME",
+        slug: `${toSlug(m.caption).slice(0, 40)}-m${order++}`,
+        title: m.caption,
+        imageUrl: `https://picsum.photos/seed/${m.seed}/600/600`,
+        imageWidth: 600,
+        imageHeight: 600,
+        authorName: m.author,
+        authorToken: `seed-author-${order}`,
+      },
+    });
+    await seedEngagement(post.id, 5 + Math.floor(Math.random() * 18));
+  }
+
+  for (const t of texts) {
+    const post = await prisma.post.create({
+      data: {
+        type: t.type,
+        slug: `${toSlug(t.title || t.body).slice(0, 40)}-t${order++}`,
+        title: t.title ?? null,
+        body: t.body,
+        authorName: t.author,
+        authorToken: `seed-author-${order}`,
+      },
+    });
+    await seedEngagement(post.id, 5 + Math.floor(Math.random() * 18));
+  }
+
   const count = await prisma.article.count();
-  console.log(`Done. ${count} articles seeded across ${categories.length} categories.`);
+  const postCount = await prisma.post.count();
+  console.log(
+    `Done. ${count} articles + ${postCount} community posts seeded across ${categories.length} categories.`,
+  );
 }
 
 main()

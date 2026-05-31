@@ -12,3 +12,7 @@ dist
 .idea
 *.tsbuildinfo
 next-env.d.ts
+
+# Subidas de usuarios (memes) — no versionar
+/public/uploads/*
+!/public/uploads/.gitkeep

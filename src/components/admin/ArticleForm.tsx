@@ -1,0 +1,122 @@
+import Link from "next/link";
+import { saveArticle } from "@/lib/admin-actions";
+
+type ArticleData = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  coverImage: string | null;
+  categoryId: string;
+  readingMinutes: number;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  published: boolean;
+  featured: boolean;
+};
+
+const input =
+  "w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900 focus:ring-2 focus:ring-accent";
+const label = "mb-1 block text-xs font-bold text-neutral-600";
+
+export function ArticleForm({
+  article,
+  categories,
+}: {
+  article?: ArticleData;
+  categories: { id: string; name: string }[];
+}) {
+  return (
+    <form action={saveArticle} className="max-w-3xl space-y-4">
+      {article && <input type="hidden" name="id" value={article.id} />}
+
+      <div>
+        <label className={label}>Título *</label>
+        <input name="title" required defaultValue={article?.title ?? ""} className={input} />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className={label}>Slug (opcional, se genera del título)</label>
+          <input name="slug" defaultValue={article?.slug ?? ""} placeholder="auto" className={input} />
+        </div>
+        <div>
+          <label className={label}>Categoría *</label>
+          <select name="categoryId" required defaultValue={article?.categoryId ?? ""} className={input}>
+            <option value="" disabled>
+              Elige…
+            </option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label className={label}>Extracto *</label>
+        <textarea name="excerpt" required rows={2} defaultValue={article?.excerpt ?? ""} className={`${input} resize-y`} />
+      </div>
+
+      <div>
+        <label className={label}>Contenido (HTML) *</label>
+        <textarea
+          name="content"
+          required
+          rows={14}
+          defaultValue={article?.content ?? ""}
+          placeholder="<p>Tu artículo en HTML…</p>"
+          className={`${input} resize-y font-mono text-xs`}
+        />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className={label}>Imagen de portada (URL)</label>
+          <input name="coverImage" defaultValue={article?.coverImage ?? ""} className={input} />
+        </div>
+        <div>
+          <label className={label}>Minutos de lectura</label>
+          <input type="number" name="readingMinutes" defaultValue={article?.readingMinutes ?? 3} className={input} />
+        </div>
+      </div>
+
+      <details className="rounded-lg border border-neutral-200 p-3">
+        <summary className="cursor-pointer text-sm font-bold text-neutral-700">SEO (opcional)</summary>
+        <div className="mt-3 space-y-3">
+          <div>
+            <label className={label}>Meta título</label>
+            <input name="metaTitle" defaultValue={article?.metaTitle ?? ""} className={input} />
+          </div>
+          <div>
+            <label className={label}>Meta descripción</label>
+            <input name="metaDescription" defaultValue={article?.metaDescription ?? ""} className={input} />
+          </div>
+        </div>
+      </details>
+
+      <div className="flex flex-wrap gap-5">
+        <label className="flex items-center gap-2 text-sm font-semibold text-neutral-800">
+          <input type="checkbox" name="published" defaultChecked={article?.published ?? false} className="h-4 w-4" />
+          Publicado
+        </label>
+        <label className="flex items-center gap-2 text-sm font-semibold text-neutral-800">
+          <input type="checkbox" name="featured" defaultChecked={article?.featured ?? false} className="h-4 w-4" />
+          Destacado
+        </label>
+      </div>
+
+      <div className="flex gap-2 pt-2">
+        <button className="rounded-lg bg-neutral-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-neutral-800">
+          {article ? "Guardar cambios" : "Crear artículo"}
+        </button>
+        <Link href="/admin/articulos" className="rounded-lg px-5 py-2.5 text-sm font-semibold text-neutral-500 hover:text-neutral-900">
+          Cancelar
+        </Link>
+      </div>
+    </form>
+  );
+}

@@ -45,6 +45,7 @@ model Category {
   order       Int     @default(0)
 
   articles Article[]
+  posts    Post[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -56,6 +57,7 @@ model Tag {
   name String @unique
 
   articles ArticleTag[]
+  posts    PostTag[]
 
   createdAt DateTime @default(now())
 }
@@ -68,5 +70,142 @@ model ArticleTag {
   tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([articleId, tagId])
+  @@index([tagId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Comunidad: posts generados por usuarios (memes, confesiones, notas)
+// ─────────────────────────────────────────────────────────────
+
+enum PostType {
+  MEME
+  CONFESSION
+  NOTE
+}
+
+enum ModStatus {
+  PUBLISHED
+  PENDING
+  REMOVED
+}
+
+model Post {
+  id           String    @id @default(cuid())
+  type         PostType
+  status       ModStatus @default(PUBLISHED)
+  slug         String    @unique
+  title        String? // confesión/nota: título; meme: caption opcional
+  body         String? // texto de confesión/nota
+  imageUrl     String? // ruta local del meme (/uploads/..)
+  imageWidth   Int? // dimensiones capturadas al subir (para next/image)
+  imageHeight  Int?
+  authorName   String    @default("Anónimo")
+  authorToken  String // id anónimo del navegador (dueño)
+  score        Int       @default(0) // denormalizado (upvotes - downvotes)
+  commentCount Int       @default(0) // denormalizado
+  nsfw         Boolean   @default(false)
+  pinned       Boolean   @default(false)
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+
+  votes     Vote[]
+  comments  Comment[]
+  reactions Reaction[]
+  tags      PostTag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type, status, createdAt])
+  @@index([type, status, score])
+  @@index([categoryId])
+}
+
+model Vote {
+  id         String   @id @default(cuid())
+  postId     String
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  voterToken String
+  value      Int // +1 / -1
+  createdAt  DateTime @default(now())
+
+  @@unique([postId, voterToken])
+  @@index([postId])
+}
+
+model Reaction {
+  id         String   @id @default(cuid())
+  postId     String
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  voterToken String
+  emoji      String // "😂" "❤️" "😮" "🔥"
+  createdAt  DateTime @default(now())
+
+  @@unique([postId, voterToken, emoji])
+  @@index([postId])
+}
+
+model Comment {
+  id          String    @id @default(cuid())
+  postId      String
+  post        Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parentId    String?
+  parent      Comment?  @relation("Thread", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     Comment[] @relation("Thread")
+  authorName  String    @default("Anónimo")
+  authorToken String
+  body        String
+  score       Int       @default(0)
+  status      ModStatus @default(PUBLISHED)
+  createdAt   DateTime  @default(now())
+
+  commentVotes CommentVote[]
+
+  @@index([postId, createdAt])
+  @@index([parentId])
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  visitor   String?
+  referrer  String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([path])
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         String   @default("admin")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model CommentVote {
+  id         String   @id @default(cuid())
+  commentId  String
+  comment    Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  voterToken String
+  value      Int // +1 / -1
+  createdAt  DateTime @default(now())
+
+  @@unique([commentId, voterToken])
+  @@index([commentId])
+}
+
+model PostTag {
+  postId String
+  tagId  String
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
   @@index([tagId])
 }

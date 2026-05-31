@@ -2,7 +2,7 @@ export const siteConfig = {
   name: process.env.NEXT_PUBLIC_SITE_NAME || "Goals Ec",
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
   description:
-    "Listas, curiosidades y noticias virales de Ecuador y el mundo. Lo que tienes que saber, contado rápido.",
+    "Aquí se vive Ecuador al máximo: memes, historias, costumbres, tradiciones, lugares increíbles, comida típica y datos curiosos. Un espacio hecho por ecuatorianos, para ecuatorianos y para todos los que aman Ecuador.",
   locale: "es_EC",
   twitter: "@goalsec",
   adsenseClient: process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "",

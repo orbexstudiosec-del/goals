@@ -44,11 +44,26 @@ export function Footer() {
             </div>
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-neutral-900">Explora</h4>
+            <h4 className="text-sm font-semibold text-neutral-900">Comunidad</h4>
             <ul className="mt-3 space-y-2 text-sm text-neutral-600">
               <li>
-                <Link href="/" className="hover:text-neutral-900">
-                  Inicio
+                <Link href="/memes" className="hover:text-neutral-900">
+                  Memes
+                </Link>
+              </li>
+              <li>
+                <Link href="/confesionario" className="hover:text-neutral-900">
+                  El Confesionario
+                </Link>
+              </li>
+              <li>
+                <Link href="/notas" className="hover:text-neutral-900">
+                  Notas curiosas
+                </Link>
+              </li>
+              <li>
+                <Link href="/publicar" className="hover:text-neutral-900">
+                  Publicar
                 </Link>
               </li>
               <li>
