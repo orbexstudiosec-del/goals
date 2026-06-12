@@ -46,7 +46,7 @@ export function SitePopup({ version, title, body, image, ctaLabel, ctaUrl }: Pro
       onClick={close}
     >
       <div
-        className="relative w-full max-w-md overflow-hidden rounded-2xl border-2 border-neutral-900 bg-white shadow-[6px_6px_0_#0a0a0a]"
+        className="relative w-full max-w-[500px] overflow-hidden rounded-2xl border-2 border-neutral-900 bg-white shadow-[6px_6px_0_#0a0a0a]"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -60,7 +60,7 @@ export function SitePopup({ version, title, body, image, ctaLabel, ctaUrl }: Pro
 
         {image && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={image} alt={title ?? ""} className="max-h-60 w-full object-cover" />
+          <img src={image} alt={title ?? ""} className="mx-auto aspect-square w-full max-w-[500px] object-cover" />
         )}
 
         <div className="p-6 text-center">
