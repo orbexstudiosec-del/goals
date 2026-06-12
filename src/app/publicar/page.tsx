@@ -4,30 +4,25 @@ import { getNickname } from "@/lib/identity";
 
 export const metadata: Metadata = {
   title: "Publicar",
-  description: "Sube un meme, escribe una confesión anónima o comparte una nota curiosa.",
+  description: "Escribe una confesión anónima en la comunidad de Goals Ec.",
 };
 
 export const dynamic = "force-dynamic";
 
-type SearchParams = Promise<{ tipo?: string }>;
-
-export default async function PublicarPage({ searchParams }: { searchParams: SearchParams }) {
-  const { tipo } = await searchParams;
+export default async function PublicarPage() {
   const nickname = await getNickname();
-  const initialTab =
-    tipo === "confesion" ? "CONFESSION" : tipo === "nota" ? "NOTE" : "MEME";
 
   return (
     <div className="mx-auto max-w-xl px-4 py-8">
       <h1 className="text-2xl font-extrabold text-neutral-900 md:text-3xl">
-        Publicar en la comunidad
+        Publicar una confesión
       </h1>
       <p className="mt-1 text-sm text-neutral-600">
-        Es 100% anónimo. Elige qué quieres compartir.
+        Es 100% anónimo. Cuéntanos lo que quieras compartir.
       </p>
 
       <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-        <CreatePostForm nickname={nickname} initialTab={initialTab} />
+        <CreatePostForm nickname={nickname} />
       </div>
     </div>
   );

@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { saveArticle } from "@/lib/admin-actions";
+import { CoverImageField } from "@/components/admin/CoverImageField";
+import { CopyLinkField } from "@/components/admin/CopyLinkField";
+import { siteConfig } from "@/lib/site";
 
 type ArticleData = {
   id: string;
@@ -14,6 +17,7 @@ type ArticleData = {
   metaDescription: string | null;
   published: boolean;
   featured: boolean;
+  shortCode?: string | null;
 };
 
 const input =
@@ -30,6 +34,13 @@ export function ArticleForm({
   return (
     <form action={saveArticle} className="max-w-3xl space-y-4">
       {article && <input type="hidden" name="id" value={article.id} />}
+
+      {article?.shortCode && (
+        <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+          <label className={label}>Link corto para compartir</label>
+          <CopyLinkField url={`${siteConfig.url}/e/${article.shortCode}`} />
+        </div>
+      )}
 
       <div>
         <label className={label}>Título *</label>
@@ -74,10 +85,7 @@ export function ArticleForm({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label className={label}>Imagen de portada (URL)</label>
-          <input name="coverImage" defaultValue={article?.coverImage ?? ""} className={input} />
-        </div>
+        <CoverImageField defaultValue={article?.coverImage} />
         <div>
           <label className={label}>Minutos de lectura</label>
           <input type="number" name="readingMinutes" defaultValue={article?.readingMinutes ?? 3} className={input} />

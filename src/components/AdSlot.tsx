@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { siteConfig } from "@/lib/site";
+import { useAdsenseClient } from "@/components/AdsenseProvider";
 
 type AdSlotProps = {
   slot: string;
@@ -17,16 +17,18 @@ declare global {
 }
 
 export function AdSlot({ slot, format = "auto", layout, className = "" }: AdSlotProps) {
+  const adsenseClient = useAdsenseClient();
+
   useEffect(() => {
-    if (!siteConfig.adsenseClient) return;
+    if (!adsenseClient) return;
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {
       // ignore
     }
-  }, []);
+  }, [adsenseClient]);
 
-  if (!siteConfig.adsenseClient) {
+  if (!adsenseClient) {
     return (
       <div
         className={`flex min-h-[90px] items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-neutral-50 text-xs text-neutral-400 ${className}`}
@@ -41,7 +43,7 @@ export function AdSlot({ slot, format = "auto", layout, className = "" }: AdSlot
     <ins
       className={`adsbygoogle block ${className}`}
       style={{ display: "block" }}
-      data-ad-client={siteConfig.adsenseClient}
+      data-ad-client={adsenseClient}
       data-ad-slot={slot}
       data-ad-format={format}
       data-ad-layout={layout}

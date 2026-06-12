@@ -10,6 +10,7 @@ datasource db {
 model Article {
   id              String    @id @default(cuid())
   slug            String    @unique
+  shortCode       String?   @unique
   title           String
   excerpt         String
   content         String
@@ -175,6 +176,44 @@ model PageView {
 
   @@index([createdAt])
   @@index([path])
+}
+
+model SiteSettings {
+  id            String   @id @default("singleton")
+  bannerEnabled Boolean  @default(true)
+  bannerText    String   @default("¡Síguenos en redes y no te pierdas nada de Goals Ec!")
+  facebookUrl   String?
+  instagramUrl  String?
+  tiktokUrl     String?
+  youtubeUrl    String?
+  xUrl          String?
+  whatsappUrl   String?
+
+  popupEnabled  Boolean @default(false)
+  popupTitle    String?
+  popupBody     String?
+  popupImage    String?
+  popupCtaLabel String?
+  popupCtaUrl   String?
+
+  // SEO / OpenGraph globales
+  seoTitle       String?
+  seoDescription String?
+  ogImage        String?
+
+  // Analytics y anuncios
+  analyticsId    String? // Google Analytics (ej. G-XXXXXXXXXX)
+  adsenseClient  String? // AdSense (ej. ca-pub-XXXXXXXXXXXXXXXX)
+
+  // Segundo banner (marcas / perfiles)
+  secondBannerEnabled Boolean @default(false)
+  secondBannerColor   String  @default("#1d4ed8")
+  goalsUrl       String?
+  tulcanenoUrl   String?
+  stevenUrl      String?
+  ecuatorianoUrl String?
+
+  updatedAt     DateTime @updatedAt
 }
 
 model AdminUser {

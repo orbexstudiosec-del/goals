@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatRelativeDate } from "@/lib/site";
 import { PostModButtons } from "@/components/admin/PostModButtons";
+import { AdminMemeForm } from "@/components/admin/AdminMemeForm";
 import type { ModStatus, PostType, Prisma } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +17,6 @@ const TYPES: { key: string; label: string }[] = [
   { key: "", label: "Todos" },
   { key: "MEME", label: "Memes" },
   { key: "CONFESSION", label: "Confesiones" },
-  { key: "NOTE", label: "Notas" },
 ];
 
 const STATUS_BADGE: Record<ModStatus, string> = {
@@ -30,11 +30,11 @@ type SearchParams = Promise<{ status?: string; type?: string }>;
 export default async function AdminComunidad({ searchParams }: { searchParams: SearchParams }) {
   const { status, type } = await searchParams;
 
-  const where: Prisma.PostWhereInput = {};
+  const where: Prisma.PostWhereInput = { type: { not: "NOTE" } };
   if (status && ["PENDING", "PUBLISHED", "REMOVED"].includes(status)) {
     where.status = status as ModStatus;
   }
-  if (type && ["MEME", "CONFESSION", "NOTE"].includes(type)) {
+  if (type && ["MEME", "CONFESSION"].includes(type)) {
     where.type = type as PostType;
   }
 
@@ -57,6 +57,16 @@ export default async function AdminComunidad({ searchParams }: { searchParams: S
     <div>
       <h1 className="text-2xl font-black text-neutral-900">Moderar comunidad</h1>
       <p className="mt-1 text-sm text-neutral-500">{posts.length} publicación(es)</p>
+
+      {/* Subir meme (solo admin) */}
+      <details className="mt-4 rounded-2xl border border-neutral-200 bg-white p-4">
+        <summary className="cursor-pointer text-sm font-bold text-neutral-800">
+          😂 Subir un meme
+        </summary>
+        <div className="mt-3 max-w-md">
+          <AdminMemeForm />
+        </div>
+      </details>
 
       {/* Filtros */}
       <div className="mt-4 flex flex-wrap gap-4">
@@ -104,7 +114,7 @@ export default async function AdminComunidad({ searchParams }: { searchParams: S
             <div className="mt-3 flex items-center justify-between gap-2">
               <PostModButtons id={p.id} status={p.status} pinned={p.pinned} />
               <Link
-                href={`/${p.type === "MEME" ? "memes" : p.type === "CONFESSION" ? "confesionario" : "notas"}/${p.slug}`}
+                href={`/${p.type === "MEME" ? "memes" : "confesionario"}/${p.slug}`}
                 target="_blank"
                 className="text-xs font-semibold text-neutral-500 hover:text-neutral-900"
               >

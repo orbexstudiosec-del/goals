@@ -4,9 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { FlagEc } from "@/components/FlagEc";
 
 const COMMUNITY = [
+  { href: "/", label: "Inicio" },
   { href: "/memes", label: "Memes" },
   { href: "/confesionario", label: "Confesionario" },
-  { href: "/notas", label: "Notas" },
 ];
 
 const CAT_EMOJI: Record<string, string> = {

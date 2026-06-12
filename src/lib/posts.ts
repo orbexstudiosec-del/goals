@@ -64,7 +64,7 @@ export async function listPosts(opts: {
   const posts = await prisma.post.findMany({
     where: {
       status: "PUBLISHED",
-      ...(opts.type ? { type: opts.type } : {}),
+      ...(opts.type ? { type: opts.type } : { type: { not: "NOTE" } }),
     },
     orderBy: orderBy(orden),
     take: opts.take ?? 24,

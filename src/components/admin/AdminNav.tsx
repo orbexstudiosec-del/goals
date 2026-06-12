@@ -9,6 +9,7 @@ const ITEMS = [
   { href: "/admin/comentarios", label: "Comentarios", icon: "💬" },
   { href: "/admin/articulos", label: "Artículos", icon: "📰" },
   { href: "/admin/categorias", label: "Categorías", icon: "🏷️" },
+  { href: "/admin/ajustes", label: "Ajustes", icon: "⚙️" },
 ];
 
 export function AdminNav() {

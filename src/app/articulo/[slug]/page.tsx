@@ -8,6 +8,7 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { JsonLd } from "@/components/JsonLd";
 import { ShareBar } from "@/components/ShareBar";
 import { absoluteUrl, formatDate, siteConfig } from "@/lib/site";
+import { getSiteSettings } from "@/lib/settings";
 
 export const revalidate = 600;
 
@@ -32,6 +33,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const description = article.metaDescription || article.excerpt;
   const url = absoluteUrl(`/articulo/${article.slug}`);
 
+  const settings = await getSiteSettings();
+  const ogImage = article.coverImage || settings.ogImage || "/og-default.png";
+
   return {
     title,
     description,
@@ -45,15 +49,13 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       locale: siteConfig.locale,
       publishedTime: article.publishedAt?.toISOString(),
       modifiedTime: article.updatedAt.toISOString(),
-      images: article.coverImage
-        ? [{ url: article.coverImage, alt: article.coverImageAlt || article.title }]
-        : undefined,
+      images: [{ url: ogImage, alt: article.coverImageAlt || article.title }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: article.coverImage ? [article.coverImage] : undefined,
+      images: [ogImage],
     },
   };
 }

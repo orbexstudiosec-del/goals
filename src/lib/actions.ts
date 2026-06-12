@@ -1,7 +1,5 @@
 "use server";
 
-import { promises as fs } from "fs";
-import path from "path";
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -12,22 +10,6 @@ import {
   displayName,
   rememberNickname,
 } from "@/lib/identity";
-
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
-const ALLOWED_MIME = new Set(["image/png", "image/jpeg", "image/gif", "image/webp"]);
-const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
-const EXT: Record<string, string> = {
-  "image/png": "png",
-  "image/jpeg": "jpg",
-  "image/gif": "gif",
-  "image/webp": "webp",
-};
-
-const PATHS_BY_TYPE: Record<string, string> = {
-  MEME: "/memes",
-  CONFESSION: "/confesionario",
-  NOTE: "/notas",
-};
 
 async function uniqueSlug(base: string): Promise<string> {
   const root = toSlug(base).slice(0, 60) || "post";
@@ -40,49 +22,6 @@ function clampText(value: FormDataEntryValue | null, max: number): string {
 }
 
 // ─────────────────────────────────────────── Crear posts
-
-export async function createMeme(formData: FormData): Promise<void> {
-  const token = await getOrCreateAnonToken();
-  const name = displayName(String(formData.get("authorName") ?? ""));
-  await rememberNickname(name);
-
-  const file = formData.get("image");
-  if (!(file instanceof File) || file.size === 0) {
-    throw new Error("Debes seleccionar una imagen.");
-  }
-  if (!ALLOWED_MIME.has(file.type)) {
-    throw new Error("Formato no permitido. Usa PNG, JPG, GIF o WEBP.");
-  }
-  if (file.size > MAX_BYTES) {
-    throw new Error("La imagen supera el límite de 5 MB.");
-  }
-
-  const caption = clampText(formData.get("title"), 140);
-  const width = Number(formData.get("imageWidth")) || null;
-  const height = Number(formData.get("imageHeight")) || null;
-
-  await fs.mkdir(UPLOAD_DIR, { recursive: true });
-  const filename = `${randomUUID()}.${EXT[file.type]}`;
-  const bytes = Buffer.from(await file.arrayBuffer());
-  await fs.writeFile(path.join(UPLOAD_DIR, filename), bytes);
-
-  const post = await prisma.post.create({
-    data: {
-      type: "MEME",
-      slug: await uniqueSlug(caption || "meme"),
-      title: caption || null,
-      imageUrl: `/uploads/${filename}`,
-      imageWidth: width,
-      imageHeight: height,
-      authorName: name,
-      authorToken: token,
-    },
-  });
-
-  revalidatePath("/memes");
-  revalidatePath("/");
-  redirect(`/memes/${post.slug}`);
-}
 
 export async function createConfession(formData: FormData): Promise<void> {
   const token = await getOrCreateAnonToken();
@@ -105,34 +44,8 @@ export async function createConfession(formData: FormData): Promise<void> {
   });
 
   revalidatePath("/confesionario");
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   redirect(`/confesionario/${post.slug}`);
-}
-
-export async function createNote(formData: FormData): Promise<void> {
-  const token = await getOrCreateAnonToken();
-  const name = displayName(String(formData.get("authorName") ?? ""));
-  await rememberNickname(name);
-
-  const title = clampText(formData.get("title"), 140);
-  const body = clampText(formData.get("body"), 3000);
-  if (title.length < 3) throw new Error("Ponle un título a tu nota.");
-  if (body.length < 5) throw new Error("Tu nota es demasiado corta.");
-
-  const post = await prisma.post.create({
-    data: {
-      type: "NOTE",
-      slug: await uniqueSlug(title),
-      title,
-      body,
-      authorName: name,
-      authorToken: token,
-    },
-  });
-
-  revalidatePath("/notas");
-  revalidatePath("/");
-  redirect(`/notas/${post.slug}`);
 }
 
 // ─────────────────────────────────────────── Votos en posts
@@ -162,7 +75,7 @@ export async function votePost(postId: string, value: 1 | -1): Promise<VoteState
   await prisma.post.update({ where: { id: postId }, data: { score } });
 
   const myVote = existing && existing.value === value ? 0 : value;
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   return { score, myVote };
 }
 
@@ -244,5 +157,5 @@ export async function reportPost(postId: string): Promise<void> {
     where: { id: postId },
     data: { status: "PENDING" },
   });
-  revalidatePath("/");
+  revalidatePath("/", "layout");
 }

@@ -34,6 +34,7 @@ export default async function EditarArticulo({ params }: { params: Params }) {
           metaDescription: article.metaDescription,
           published: article.published,
           featured: article.featured,
+          shortCode: article.shortCode,
         }}
       />
     </div>

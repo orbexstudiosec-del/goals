@@ -22,7 +22,6 @@ const ZONES: {
 }[] = [
   { href: "/memes", label: "Memes", emoji: "😂", type: "MEME", gradient: "from-violet-500 to-purple-700" },
   { href: "/confesionario", label: "Confesionario", emoji: "🤫", type: "CONFESSION", gradient: "from-pink-500 to-rose-700" },
-  { href: "/notas", label: "Notas curiosas", emoji: "💡", type: "NOTE", gradient: "from-sky-500 to-cyan-700" },
 ];
 
 const MINI = [
@@ -227,7 +226,7 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
               letter={cat.name.charAt(0)}
               color={cat.color}
               name={cat.name}
-              count={`${cat._count.articles} notas`}
+              count={`${cat._count.articles} artículos`}
               action="Ver"
             />
           ))}
