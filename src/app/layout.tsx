@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { headers } from "next/headers";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -9,6 +8,7 @@ import { SocialBanner } from "@/components/SocialBanner";
 import { SecondBanner } from "@/components/SecondBanner";
 import { SitePopup } from "@/components/SitePopup";
 import { AdsenseProvider } from "@/components/AdsenseProvider";
+import { ChromeGate } from "@/components/ChromeGate";
 import { siteConfig } from "@/lib/site";
 import { getSiteSettings } from "@/lib/settings";
 
@@ -73,57 +73,65 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = (await headers()).get("x-pathname") || "";
-  const isAdmin = pathname.startsWith("/admin");
-  const settings = isAdmin ? null : await getSiteSettings();
+  const settings = await getSiteSettings();
 
   // Códigos configurables desde el admin (con respaldo a variable de entorno).
-  const adsenseClient = settings?.adsenseClient?.trim() || siteConfig.adsenseClient || null;
-  const analyticsId = settings?.analyticsId?.trim() || null;
+  const adsenseClient = settings.adsenseClient?.trim() || siteConfig.adsenseClient || null;
+  const analyticsId = settings.analyticsId?.trim() || null;
+
+  const showPopup =
+    settings.popupEnabled && (settings.popupTitle || settings.popupBody || settings.popupImage);
 
   return (
     <html lang="es-EC">
       <body className="flex min-h-screen flex-col bg-[#fbf6f1] text-neutral-900">
-        {adsenseClient && !isAdmin && (
-          <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        )}
-        {analyticsId && !isAdmin && (
-          <>
-            <Script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${analyticsId}`}
-              strategy="afterInteractive"
-            />
-            <Script id="ga-init" strategy="afterInteractive">
-              {`window.dataLayer = window.dataLayer || [];
+        <AdsenseProvider client={adsenseClient}>
+          {/* Chrome público: se oculta automáticamente en /admin */}
+          <ChromeGate>
+            {adsenseClient && (
+              <Script
+                async
+                src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
+                crossOrigin="anonymous"
+                strategy="afterInteractive"
+              />
+            )}
+            {analyticsId && (
+              <>
+                <Script
+                  async
+                  src={`https://www.googletagmanager.com/gtag/js?id=${analyticsId}`}
+                  strategy="afterInteractive"
+                />
+                <Script id="ga-init" strategy="afterInteractive">
+                  {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', '${analyticsId}');`}
-            </Script>
-          </>
-        )}
-        <AdsenseProvider client={isAdmin ? null : adsenseClient}>
-          {settings && <SocialBanner settings={settings} />}
-          {settings && <SecondBanner settings={settings} />}
-          {!isAdmin && <Header />}
+                </Script>
+              </>
+            )}
+            <SocialBanner settings={settings} />
+            <SecondBanner settings={settings} />
+            <Header />
+          </ChromeGate>
+
           <main className="flex-1">{children}</main>
-          {settings && <Footer settings={settings} />}
-          {settings?.popupEnabled && (settings.popupTitle || settings.popupBody || settings.popupImage) && (
-            <SitePopup
-              version={settings.updatedAt.toISOString()}
-              title={settings.popupTitle}
-              body={settings.popupBody}
-              image={settings.popupImage}
-              ctaLabel={settings.popupCtaLabel}
-              ctaUrl={settings.popupCtaUrl}
-            />
-          )}
-          {!isAdmin && <Analytics />}
+
+          <ChromeGate>
+            <Footer settings={settings} />
+            {showPopup && (
+              <SitePopup
+                version={settings.updatedAt.toISOString()}
+                title={settings.popupTitle}
+                body={settings.popupBody}
+                image={settings.popupImage}
+                ctaLabel={settings.popupCtaLabel}
+                ctaUrl={settings.popupCtaUrl}
+              />
+            )}
+            <Analytics />
+          </ChromeGate>
         </AdsenseProvider>
       </body>
     </html>
