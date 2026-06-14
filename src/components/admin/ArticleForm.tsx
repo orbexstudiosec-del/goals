@@ -2,6 +2,7 @@ import Link from "next/link";
 import { saveArticle } from "@/lib/admin-actions";
 import { CoverImageField } from "@/components/admin/CoverImageField";
 import { CopyLinkField } from "@/components/admin/CopyLinkField";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { siteConfig } from "@/lib/site";
 
 type ArticleData = {
@@ -73,15 +74,12 @@ export function ArticleForm({
       </div>
 
       <div>
-        <label className={label}>Contenido (HTML) *</label>
-        <textarea
-          name="content"
-          required
-          rows={14}
-          defaultValue={article?.content ?? ""}
-          placeholder="<p>Tu artículo en HTML…</p>"
-          className={`${input} resize-y font-mono text-xs`}
-        />
+        <label className={label}>Contenido *</label>
+        <RichTextEditor name="content" defaultValue={article?.content ?? ""} />
+        <p className="mt-1 text-xs text-neutral-400">
+          Usa la barra para dar formato (negrita, títulos, listas, alineación…). El botón
+          <span className="font-mono"> {"</>"} </span> permite editar el HTML directamente.
+        </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
