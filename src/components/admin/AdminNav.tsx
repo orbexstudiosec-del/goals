@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 const ITEMS = [
   { href: "/admin", label: "Dashboard", icon: "📊", exact: true },
   { href: "/admin/comunidad", label: "Comunidad", icon: "🛡️" },
+  { href: "/admin/pronosticos", label: "Pronósticos", icon: "⚽" },
+  { href: "/admin/sorteos", label: "Sorteos", icon: "🎁" },
   { href: "/admin/comentarios", label: "Comentarios", icon: "💬" },
   { href: "/admin/articulos", label: "Artículos", icon: "📰" },
   { href: "/admin/categorias", label: "Categorías", icon: "🏷️" },

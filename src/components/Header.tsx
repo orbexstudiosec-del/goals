@@ -7,6 +7,7 @@ const COMMUNITY = [
   { href: "/", label: "Inicio" },
   { href: "/memes", label: "Memes" },
   { href: "/confesionario", label: "Confesionario" },
+  { href: "/pronosticos", label: "Mundial 2026" },
 ];
 
 const CAT_EMOJI: Record<string, string> = {

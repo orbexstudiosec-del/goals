@@ -11,6 +11,7 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed-ec": "tsx scripts/seed-ecuador-2026.ts",
     "db:studio": "prisma studio",
     "admin:create": "tsx scripts/create-admin.ts"
   },
