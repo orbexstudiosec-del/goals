@@ -9,6 +9,7 @@ import { SecondBanner } from "@/components/SecondBanner";
 import { SitePopup } from "@/components/SitePopup";
 import { AdsenseProvider } from "@/components/AdsenseProvider";
 import { ChromeGate } from "@/components/ChromeGate";
+import { FlagEmojiFix } from "@/components/FlagEmojiFix";
 import { siteConfig } from "@/lib/site";
 import { getSiteSettings } from "@/lib/settings";
 
@@ -117,6 +118,7 @@ gtag('config', '${analyticsId}');`}
           </ChromeGate>
 
           <main className="flex-1">{children}</main>
+          <FlagEmojiFix />
 
           <ChromeGate>
             <Footer settings={settings} />
