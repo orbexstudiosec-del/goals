@@ -9,6 +9,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { ShareBar } from "@/components/ShareBar";
 import { absoluteUrl, formatDate, siteConfig } from "@/lib/site";
 import { getSiteSettings } from "@/lib/settings";
+import { withFlags, flagsToHtml } from "@/lib/flags";
 
 export const revalidate = 600;
 
@@ -124,10 +125,10 @@ export default async function ArticlePage({ params }: { params: Params }) {
       </span>
 
       <h1 className="mt-3 text-3xl font-extrabold leading-tight text-neutral-900 md:text-4xl">
-        {article.title}
+        {withFlags(article.title)}
       </h1>
 
-      <p className="mt-3 text-lg text-neutral-600">{article.excerpt}</p>
+      <p className="mt-3 text-lg text-neutral-600">{withFlags(article.excerpt)}</p>
 
       <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-neutral-500">
         {article.publishedAt && <time dateTime={article.publishedAt.toISOString()}>{formatDate(article.publishedAt)}</time>}
@@ -154,7 +155,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
 
       <div
         className="article-body"
-        dangerouslySetInnerHTML={{ __html: article.content }}
+        dangerouslySetInnerHTML={{ __html: flagsToHtml(article.content) }}
       />
 
       <AdSlot slot="article-bottom" layout="in-article" format="fluid" className="my-8" />

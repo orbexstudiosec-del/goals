@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { formatRelativeDate } from "@/lib/site";
+import { withFlags } from "@/lib/flags";
 
 type ArticleCardArticle = {
   slug: string;
@@ -49,10 +50,10 @@ export function ArticleCard({
             {article.category.name}
           </span>
           <h2 className="mt-3 max-w-3xl text-2xl font-extrabold leading-tight text-white md:text-4xl">
-            {article.title}
+            {withFlags(article.title)}
           </h2>
           <p className="mt-2 line-clamp-2 max-w-2xl text-sm text-neutral-200 md:text-base">
-            {article.excerpt}
+            {withFlags(article.excerpt)}
           </p>
         </div>
       </Link>
@@ -78,7 +79,7 @@ export function ArticleCard({
             {article.category.name}
           </p>
           <h3 className="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-neutral-900 group-hover:text-brand-600">
-            {article.title}
+            {withFlags(article.title)}
           </h3>
         </div>
       </Link>
@@ -109,9 +110,9 @@ export function ArticleCard({
           {article.category.name}
         </span>
         <h3 className="mt-2 line-clamp-2 text-lg font-bold leading-snug text-neutral-900 group-hover:text-brand-600">
-          {article.title}
+          {withFlags(article.title)}
         </h3>
-        <p className="mt-1.5 line-clamp-2 text-sm text-neutral-600">{article.excerpt}</p>
+        <p className="mt-1.5 line-clamp-2 text-sm text-neutral-600">{withFlags(article.excerpt)}</p>
         <div className="mt-auto flex items-center gap-2 pt-3 text-xs text-neutral-500">
           {article.publishedAt && <span>{formatRelativeDate(article.publishedAt)}</span>}
           <span aria-hidden>·</span>
