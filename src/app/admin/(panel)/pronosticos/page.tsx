@@ -27,7 +27,15 @@ export default async function AdminPronosticos() {
 
   return (
     <div>
-      <h1 className="text-2xl font-black text-neutral-900">Mundial 2026 · Partidos</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1 className="text-2xl font-black text-neutral-900">Mundial 2026 · Partidos</h1>
+        <a
+          href="/admin/jugadores"
+          className="rounded-full bg-neutral-900 px-4 py-1.5 text-sm font-bold text-white transition hover:bg-neutral-800"
+        >
+          👥 Ver jugadores
+        </a>
+      </div>
       <p className="mt-1 text-sm text-neutral-500">{matches.length} partido(s)</p>
 
       {/* Crear partido */}

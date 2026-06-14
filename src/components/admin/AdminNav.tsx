@@ -7,6 +7,7 @@ const ITEMS = [
   { href: "/admin", label: "Dashboard", icon: "📊", exact: true },
   { href: "/admin/comunidad", label: "Comunidad", icon: "🛡️" },
   { href: "/admin/pronosticos", label: "Pronósticos", icon: "⚽" },
+  { href: "/admin/jugadores", label: "Jugadores", icon: "👥" },
   { href: "/admin/sorteos", label: "Sorteos", icon: "🎁" },
   { href: "/admin/comentarios", label: "Comentarios", icon: "💬" },
   { href: "/admin/articulos", label: "Artículos", icon: "📰" },
