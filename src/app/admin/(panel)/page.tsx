@@ -6,6 +6,7 @@ import {
   getTopPages,
 } from "@/lib/analytics";
 import { ViewsChart } from "@/components/admin/ViewsChart";
+import { RealtimePanel } from "@/components/admin/RealtimePanel";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +42,11 @@ export default async function AdminDashboard() {
     <div>
       <h1 className="text-2xl font-black text-neutral-900">Dashboard</h1>
       <p className="mt-1 text-sm text-neutral-500">Resumen de la comunidad Goals Ec.</p>
+
+      {/* ── En vivo (tiempo real) ── */}
+      <div className="mt-5">
+        <RealtimePanel />
+      </div>
 
       {/* ── Analíticas de visitas ── */}
       <h2 className="mt-6 flex items-center gap-2 text-lg font-extrabold text-neutral-900">
