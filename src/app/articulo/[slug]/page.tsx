@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -137,16 +136,13 @@ export default async function ArticlePage({ params }: { params: Params }) {
       </div>
 
       {article.coverImage && (
-        <div className="relative mt-6 aspect-[16/9] w-full overflow-hidden rounded-xl bg-neutral-100">
-          <Image
-            src={article.coverImage}
-            alt={article.coverImageAlt || article.title}
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, 768px"
-            className="object-cover"
-          />
-        </div>
+        // Imagen completa, a su proporción/tamaño original (sin recorte).
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={article.coverImage}
+          alt={article.coverImageAlt || article.title}
+          className="mx-auto mt-6 block h-auto max-w-full rounded-xl bg-neutral-100"
+        />
       )}
 
       <AdSlot slot="article-top" className="my-6" />

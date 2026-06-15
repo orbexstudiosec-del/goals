@@ -50,7 +50,7 @@ body {
   @apply my-6 border-l-4 border-brand-500 bg-brand-50 px-5 py-3 italic text-neutral-700;
 }
 .article-body img {
-  @apply my-6 rounded-lg;
+  @apply mx-auto my-6 block h-auto max-w-full rounded-lg;
 }
 
 /* Explosión de emojis del mockup */
