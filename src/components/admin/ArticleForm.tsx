@@ -3,7 +3,6 @@ import { saveArticle } from "@/lib/admin-actions";
 import { CoverImageField } from "@/components/admin/CoverImageField";
 import { CopyLinkField } from "@/components/admin/CopyLinkField";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
-import { ImageGalleryField } from "@/components/admin/ImageGalleryField";
 import { siteConfig } from "@/lib/site";
 
 type ArticleData = {
@@ -92,8 +91,6 @@ export function ArticleForm({
           <input type="number" name="readingMinutes" defaultValue={article?.readingMinutes ?? 3} className={input} />
         </div>
       </div>
-
-      <ImageGalleryField />
 
       <details className="rounded-lg border border-neutral-200 p-3">
         <summary className="cursor-pointer text-sm font-bold text-neutral-700">SEO (opcional)</summary>
