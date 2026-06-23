@@ -180,6 +180,8 @@ export async function saveArticle(formData: FormData): Promise<void> {
     readingMinutes: Math.max(1, num(formData.get("readingMinutes"), Math.round(content.length / 1000) || 3)),
   };
 
+  let savedId: string;
+
   if (id) {
     const existing = await prisma.article.findUnique({
       where: { id },
@@ -191,15 +193,17 @@ export async function saveArticle(formData: FormData): Promise<void> {
       ? (existing?.published ? existing.publishedAt : new Date())
       : null;
     await prisma.article.update({ where: { id }, data: { ...data, shortCode, publishedAt } });
+    savedId = id;
   } else {
-    await prisma.article.create({
+    const created = await prisma.article.create({
       data: { ...data, shortCode: await generateShortCode(), publishedAt: published ? new Date() : null },
     });
+    savedId = created.id;
   }
 
   revalidatePath("/admin/articulos");
   revalidatePath("/", "layout");
-  redirect("/admin/articulos");
+  redirect(`/admin/articulos/${savedId}?saved=1`);
 }
 
 export async function toggleArticlePublished(id: string): Promise<void> {

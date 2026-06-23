@@ -119,9 +119,6 @@ export function RichTextEditor({
       { icon: "⛓", title: "Quitar enlace", run: () => exec("unlink") },
       { icon: "⌫", title: "Limpiar formato", run: () => exec("removeFormat") },
     ],
-    [
-      { icon: imgUploading ? "…" : "🖼", title: "Insertar imagen", run: () => imgInputRef.current?.click() },
-    ],
   ];
 
   return (
@@ -147,6 +144,18 @@ export function RichTextEditor({
             ))}
           </span>
         ))}
+        {sep}
+        <button
+          type="button"
+          title="Insertar imagen en el contenido"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => imgInputRef.current?.click()}
+          disabled={mode === "html" || imgUploading}
+          className="flex h-8 items-center gap-1.5 rounded bg-blue-600 px-3 text-xs font-bold text-white transition hover:bg-blue-700 active:scale-95 disabled:opacity-40"
+        >
+          {imgUploading ? "Subiendo…" : "🖼 Imagen"}
+        </button>
+
         <span className="ml-auto flex items-center gap-0.5">
           {sep}
           <button
