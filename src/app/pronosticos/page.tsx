@@ -184,7 +184,15 @@ export default async function PronosticosPage() {
                       )}
                       <span className="capitalize">🕒 {kickoffLabel(m.kickoff)}</span>
                     </div>
-                    <Countdown kickoff={m.kickoff.toISOString()} />
+                    <div className="flex items-center gap-2">
+                      <Countdown kickoff={m.kickoff.toISOString()} />
+                      <Link
+                        href={`/pronosticos/partido/${m.id}`}
+                        className="rounded-full bg-neutral-100 px-2.5 py-0.5 font-bold text-neutral-600 hover:bg-neutral-200"
+                      >
+                        🔗 Compartir
+                      </Link>
+                    </div>
                   </div>
 
                   {me ? (
