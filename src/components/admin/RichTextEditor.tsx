@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Editor visual (WYSIWYG) tipo WordPress, sin dependencias externas.
@@ -24,7 +24,9 @@ export function RichTextEditor({
 }) {
   const editorRef = useRef<HTMLDivElement>(null);
   const fieldRef = useRef<HTMLTextAreaElement>(null);
+  const imgInputRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = useState<"visual" | "html">("visual");
+  const [imgUploading, setImgUploading] = useState(false);
 
   // Carga inicial del contenido en el editor visual y en el campo oculto.
   useEffect(() => {
@@ -49,6 +51,31 @@ export function RichTextEditor({
     const url = window.prompt("URL del enlace:", "https://");
     if (url) exec("createLink", url);
   };
+
+  const onImagePick = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImgUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      const data = await res.json().catch(() => ({}));
+      if (data.url) {
+        editorRef.current?.focus();
+        document.execCommand(
+          "insertHTML",
+          false,
+          `<img src="${data.url}" alt="" style="max-width:100%;height:auto;display:block;margin:8px auto;">`,
+        );
+        sync();
+      }
+    } finally {
+      setImgUploading(false);
+      if (imgInputRef.current) imgInputRef.current.value = "";
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const toggleMode = () => {
     if (mode === "visual") {
@@ -91,6 +118,9 @@ export function RichTextEditor({
       { icon: "🔗", title: "Insertar enlace", run: addLink },
       { icon: "⛓", title: "Quitar enlace", run: () => exec("unlink") },
       { icon: "⌫", title: "Limpiar formato", run: () => exec("removeFormat") },
+    ],
+    [
+      { icon: imgUploading ? "…" : "🖼", title: "Insertar imagen", run: () => imgInputRef.current?.click() },
     ],
   ];
 
@@ -142,6 +172,14 @@ export function RichTextEditor({
         className={`article-body min-h-[320px] max-w-none overflow-auto px-4 py-3 outline-none ${
           mode === "html" ? "hidden" : ""
         }`}
+      />
+
+      <input
+        ref={imgInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/gif,image/webp"
+        onChange={onImagePick}
+        className="hidden"
       />
 
       {/* Editor HTML (también es el campo que envía el formulario) */}

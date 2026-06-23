@@ -167,6 +167,7 @@ export async function saveArticle(formData: FormData): Promise<void> {
 
   const data = {
     title,
+    slug,
     excerpt,
     content,
     categoryId,
@@ -177,16 +178,23 @@ export async function saveArticle(formData: FormData): Promise<void> {
     published,
     featured,
     readingMinutes: Math.max(1, num(formData.get("readingMinutes"), Math.round(content.length / 1000) || 3)),
-    publishedAt: published ? new Date() : null,
   };
 
   if (id) {
-    // Asigna un código corto si la entrada aún no tiene uno.
-    const existing = await prisma.article.findUnique({ where: { id }, select: { shortCode: true } });
+    const existing = await prisma.article.findUnique({
+      where: { id },
+      select: { shortCode: true, published: true, publishedAt: true },
+    });
     const shortCode = existing?.shortCode ?? (await generateShortCode());
-    await prisma.article.update({ where: { id }, data: { ...data, shortCode } });
+    // Solo actualiza publishedAt cuando cambia de borrador a publicado
+    const publishedAt = published
+      ? (existing?.published ? existing.publishedAt : new Date())
+      : null;
+    await prisma.article.update({ where: { id }, data: { ...data, shortCode, publishedAt } });
   } else {
-    await prisma.article.create({ data: { ...data, slug, shortCode: await generateShortCode() } });
+    await prisma.article.create({
+      data: { ...data, shortCode: await generateShortCode(), publishedAt: published ? new Date() : null },
+    });
   }
 
   revalidatePath("/admin/articulos");

@@ -3,6 +3,7 @@ import { saveArticle } from "@/lib/admin-actions";
 import { CoverImageField } from "@/components/admin/CoverImageField";
 import { CopyLinkField } from "@/components/admin/CopyLinkField";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { ImageGalleryField } from "@/components/admin/ImageGalleryField";
 import { siteConfig } from "@/lib/site";
 
 type ArticleData = {
@@ -32,6 +33,8 @@ export function ArticleForm({
   article?: ArticleData;
   categories: { id: string; name: string }[];
 }) {
+  const articleUrl = article?.slug ? `${siteConfig.url}/articulo/${article.slug}` : null;
+
   return (
     <form action={saveArticle} className="max-w-3xl space-y-4">
       {article && <input type="hidden" name="id" value={article.id} />}
@@ -77,8 +80,8 @@ export function ArticleForm({
         <label className={label}>Contenido *</label>
         <RichTextEditor name="content" defaultValue={article?.content ?? ""} />
         <p className="mt-1 text-xs text-neutral-400">
-          Usa la barra para dar formato (negrita, títulos, listas, alineación…). El botón
-          <span className="font-mono"> {"</>"} </span> permite editar el HTML directamente.
+          Usa la barra para dar formato. El botón <span className="font-mono">🖼</span> sube e inserta una imagen
+          directamente en el contenido. El botón <span className="font-mono">{"</>"}</span> permite editar el HTML.
         </p>
       </div>
 
@@ -89,6 +92,8 @@ export function ArticleForm({
           <input type="number" name="readingMinutes" defaultValue={article?.readingMinutes ?? 3} className={input} />
         </div>
       </div>
+
+      <ImageGalleryField />
 
       <details className="rounded-lg border border-neutral-200 p-3">
         <summary className="cursor-pointer text-sm font-bold text-neutral-700">SEO (opcional)</summary>
@@ -104,15 +109,31 @@ export function ArticleForm({
         </div>
       </details>
 
-      <div className="flex flex-wrap gap-5">
-        <label className="flex items-center gap-2 text-sm font-semibold text-neutral-800">
-          <input type="checkbox" name="published" defaultChecked={article?.published ?? false} className="h-4 w-4" />
-          Publicado
-        </label>
-        <label className="flex items-center gap-2 text-sm font-semibold text-neutral-800">
-          <input type="checkbox" name="featured" defaultChecked={article?.featured ?? false} className="h-4 w-4" />
-          Destacado
-        </label>
+      <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+        <p className="mb-2 text-xs font-bold text-neutral-600">Estado de publicación</p>
+        <div className="flex flex-wrap gap-5">
+          <label className="flex items-center gap-2 text-sm font-semibold text-neutral-800">
+            <input type="checkbox" name="published" defaultChecked={article?.published ?? false} className="h-4 w-4" />
+            Publicado
+          </label>
+          <label className="flex items-center gap-2 text-sm font-semibold text-neutral-800">
+            <input type="checkbox" name="featured" defaultChecked={article?.featured ?? false} className="h-4 w-4" />
+            Destacado
+          </label>
+        </div>
+        {article?.published && articleUrl && (
+          <a
+            href={articleUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-emerald-700 hover:underline"
+          >
+            Ver artículo publicado →
+          </a>
+        )}
+        {article && !article.published && (
+          <p className="mt-2 text-xs text-amber-600">Este artículo es un borrador y no es visible al público.</p>
+        )}
       </div>
 
       <div className="flex gap-2 pt-2">
