@@ -24,6 +24,7 @@ export async function ZoneFeed({
 }: Props) {
   const ord = parseOrden(orden);
   const posts = await listPosts({ type, orden: ord, take: 40 });
+  const canPublish = type !== "MEME";
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6">
@@ -32,12 +33,14 @@ export async function ZoneFeed({
           <h1 className="text-2xl font-extrabold text-neutral-900 md:text-3xl">{title}</h1>
           <p className="mt-1 text-sm text-neutral-600">{description}</p>
         </div>
-        <Link
-          href="/publicar"
-          className="rounded-full bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-700"
-        >
-          + Publicar
-        </Link>
+        {canPublish && (
+          <Link
+            href="/publicar"
+            className="rounded-full bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-700"
+          >
+            + Publicar
+          </Link>
+        )}
       </div>
 
       <FeedTabs basePath={basePath} orden={ord} />
@@ -47,12 +50,14 @@ export async function ZoneFeed({
       {posts.length === 0 ? (
         <div className="rounded-xl border border-dashed border-neutral-300 bg-neutral-50 py-16 text-center">
           <p className="text-neutral-600">Todavía no hay nada por aquí.</p>
-          <Link
-            href="/publicar"
-            className="mt-3 inline-block rounded-full bg-brand-600 px-5 py-2 text-sm font-bold text-white hover:bg-brand-700"
-          >
-            Sé el primero en publicar
-          </Link>
+          {canPublish && (
+            <Link
+              href="/publicar"
+              className="mt-3 inline-block rounded-full bg-brand-600 px-5 py-2 text-sm font-bold text-white hover:bg-brand-700"
+            >
+              Sé el primero en publicar
+            </Link>
+          )}
         </div>
       ) : (
         <div
