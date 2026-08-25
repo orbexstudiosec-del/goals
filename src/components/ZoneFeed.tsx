@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FeedTabs } from "@/components/FeedTabs";
 import { PostCard } from "@/components/PostCard";
+import { MemeFeed } from "@/components/MemeFeed";
 import { AdSlot } from "@/components/AdSlot";
 import { listPosts, parseOrden } from "@/lib/posts";
 import type { PostType } from "@prisma/client";
@@ -25,6 +26,7 @@ export async function ZoneFeed({
   const ord = parseOrden(orden);
   const posts = await listPosts({ type, orden: ord, take: 40 });
   const canPublish = type !== "MEME";
+  const isMeme = type === "MEME";
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6">
@@ -58,6 +60,10 @@ export async function ZoneFeed({
               Sé el primero en publicar
             </Link>
           )}
+        </div>
+      ) : isMeme ? (
+        <div className="mt-5">
+          <MemeFeed posts={posts} />
         </div>
       ) : (
         <div

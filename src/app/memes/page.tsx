@@ -19,7 +19,6 @@ export default async function MemesPage({ searchParams }: { searchParams: Search
       description="Los memes más virales subidos por la comunidad."
       basePath="/memes"
       orden={orden}
-      columns={2}
     />
   );
 }
