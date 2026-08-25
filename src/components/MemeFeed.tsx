@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ReactionBar } from "@/components/ReactionBar";
 import { absoluteUrl } from "@/lib/site";
 import type { PostListItem } from "@/lib/posts";
 
@@ -67,14 +68,19 @@ export function MemeFeed({ posts }: { posts: PostListItem[] }) {
               ))}
             </div>
 
-            <div className="flex items-center justify-between gap-2 px-3 pb-3 text-xs text-white/70">
-              <div className="min-w-0">
-                {post.title && <p className="truncate font-semibold text-white">{post.title}</p>}
-                <p className="text-white/50">{post.authorName}</p>
-              </div>
-              <div className="flex flex-shrink-0 items-center gap-2 font-bold">
-                <span>▲ {post.score}</span>
-                <span>💬 {post.commentCount}</span>
+            <div className="px-3 pb-3">
+              {post.title && (
+                <p className="truncate text-sm font-semibold text-white">{post.title}</p>
+              )}
+              <p className="text-xs text-white/50">{post.authorName}</p>
+
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                <ReactionBar
+                  postId={post.id}
+                  initialCounts={post.reactionCounts}
+                  initialMine={post.myReactions}
+                />
+                <span className="text-xs font-bold text-white/70">💬 {post.commentCount}</span>
               </div>
             </div>
           </article>

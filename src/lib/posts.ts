@@ -8,8 +8,12 @@ export function parseOrden(value: string | undefined): Orden {
   return value === "top" ? "top" : "nuevo";
 }
 
-function orderBy(orden: Orden): Prisma.PostOrderByWithRelationInput[] {
+function orderBy(orden: Orden, type?: PostType): Prisma.PostOrderByWithRelationInput[] {
   if (orden === "top") {
+    // Los memes se ordenan por reacciones (no hay voto visible en su feed).
+    if (type === "MEME") {
+      return [{ pinned: "desc" }, { reactions: { _count: "desc" } }, { createdAt: "desc" }];
+    }
     return [{ pinned: "desc" }, { score: "desc" }, { createdAt: "desc" }];
   }
   return [{ pinned: "desc" }, { createdAt: "desc" }];
@@ -66,7 +70,7 @@ export async function listPosts(opts: {
       status: "PUBLISHED",
       ...(opts.type ? { type: opts.type } : { type: { not: "NOTE" } }),
     },
-    orderBy: orderBy(orden),
+    orderBy: orderBy(orden, opts.type),
     take: opts.take ?? 24,
     skip: opts.skip ?? 0,
     select: {
