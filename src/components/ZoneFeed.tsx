@@ -47,7 +47,7 @@ export async function ZoneFeed({
 
       <FeedTabs basePath={basePath} orden={ord} />
 
-      <AdSlot slot="zone-top" className="my-6" />
+      {!isMeme && <AdSlot slot="zone-top" className="my-6" />}
 
       {posts.length === 0 ? (
         <div className="rounded-xl border border-dashed border-neutral-300 bg-neutral-50 py-16 text-center">
