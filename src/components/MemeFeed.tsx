@@ -1,14 +1,8 @@
 import Image from "next/image";
 import { ReactionBar } from "@/components/ReactionBar";
+import { ShareButton } from "@/components/ShareButton";
 import { absoluteUrl } from "@/lib/site";
 import type { PostListItem } from "@/lib/posts";
-
-const SHARE_BUTTONS = (url: string, text: string) => [
-  { label: "Facebook", href: `https://www.facebook.com/sharer/sharer.php?u=${url}`, bg: "bg-[#1877F2]" },
-  { label: "WhatsApp", href: `https://wa.me/?text=${text}%20${url}`, bg: "bg-[#25D366]" },
-  { label: "X", href: `https://twitter.com/intent/tweet?text=${text}&url=${url}`, bg: "bg-black" },
-  { label: "Telegram", href: `https://t.me/share/url?url=${url}&text=${text}`, bg: "bg-[#0088cc]" },
-];
 
 /** Feed de memes estilo Instagram: imagen grande directo en la página, con descargar + compartir siempre visibles debajo. */
 export function MemeFeed({ posts }: { posts: PostListItem[] }) {
@@ -16,8 +10,7 @@ export function MemeFeed({ posts }: { posts: PostListItem[] }) {
     <div className="space-y-6">
       {posts.map((post, i) => {
         if (!post.imageUrl) return null;
-        const url = encodeURIComponent(absoluteUrl(`/memes/${post.slug}`));
-        const text = encodeURIComponent(post.title || "Meme");
+        const title = post.title || "Meme";
         const filename = post.imageUrl.split("/").pop() || "meme.jpg";
 
         return (
@@ -55,17 +48,7 @@ export function MemeFeed({ posts }: { posts: PostListItem[] }) {
               >
                 ⬇ Descargar
               </a>
-              {SHARE_BUTTONS(url, text).map((b) => (
-                <a
-                  key={b.label}
-                  href={b.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`rounded-full px-3 py-1.5 text-sm font-bold text-white hover:opacity-90 ${b.bg}`}
-                >
-                  {b.label}
-                </a>
-              ))}
+              <ShareButton url={absoluteUrl(`/memes/${post.slug}`)} title={title} />
             </div>
 
             <div className="px-3 pb-3">
